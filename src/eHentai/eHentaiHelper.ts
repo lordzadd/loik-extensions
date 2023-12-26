@@ -5,6 +5,9 @@ import {
 } from 'paperback-extensions-common'
 
 import { parseTitle } from './eHentaiParser'
+//import * as cheerio from 'cheerio';
+
+import { CheerioAPI } from 'cheerio';
 
 export async function getGalleryData(ids: string[], requestManager: RequestManager): Promise<any> {
     const request = createRequestObject({
@@ -28,10 +31,15 @@ export async function getGalleryData(ids: string[], requestManager: RequestManag
 export async function getSearchData(query: string | undefined, page: number, categories: number, requestManager: RequestManager, cheerio: CheerioAPI, stateManager: SourceStateManager): Promise<MangaTile[]> {
     if (query != undefined && query.length != 0 && query.split(' ').filter(q => !q.startsWith('-')).length != 0 && await stateManager.retrieve('extraSearchArgs')) query += ` ${await stateManager.retrieve('extraSearchArgs')}`
     const request = createRequestObject({
-        url: `https://e-hentai.org/?page=${page}&f_cats=${categories}&f_search=${encodeURIComponent(query ?? '')}`,
+        url: `https://e-hentai.org/?f_search=${encodeURIComponent(query ?? '')}&range=${calculateRange(page)}`,
         method: 'GET'
     })
-
+    function calculateRange(pageNumber: number) {
+        const itemsPerPage = 25; // Each page has 25 items
+        // Calculate the index of the first item on the requested page
+        // Page 1 starts at index 0, Page 2 starts at index 25, etc.
+        return (pageNumber - 1) * itemsPerPage;
+    }
     const data = await requestManager.schedule(request, 1)
     const $ = cheerio.load(data.data)
 

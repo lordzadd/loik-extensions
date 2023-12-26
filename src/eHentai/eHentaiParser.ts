@@ -4,6 +4,10 @@ import {
     TagSection
 } from 'paperback-extensions-common'
 
+//import * as cheerio from 'cheerio';
+
+import { CheerioAPI } from 'cheerio';
+
 export const parseArtist = (tags: string[]): string | undefined => {
     const artist = tags.filter(tag => tag.startsWith('artist:')).map(tag => tag.substring(7))
     const cosplayer = tags.filter(tag => tag.startsWith('cosplayer:')).map(tag => tag.substring(10))
